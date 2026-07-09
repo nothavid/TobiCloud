@@ -1,0 +1,22 @@
+[project]
+name = "tobicloud"
+version = "0.1.0"
+description = "TobiCloud"
+requires-python = ">=3.12"
+dependencies = [
+    "cryptography>=42.0.0",
+    "requests>=2.31.0",
+    "typer>=0.12.0",
+]
+
+[project.scripts]
+tobicloud = "tobicloud.cli:app"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

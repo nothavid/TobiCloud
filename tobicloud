@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+
+PROJECT_ROOT="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+VENV_CLI="$PROJECT_ROOT/.venv/bin/tobicloud"
+
+if [ -x "$VENV_CLI" ]; then
+    exec "$VENV_CLI" "$@"
+fi
+
+exec uv run tobicloud "$@"
