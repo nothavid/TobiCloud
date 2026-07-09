@@ -13,6 +13,15 @@ tobicloud download <hash-or-alias> <downloadpath>
 
 The CLI is only the interface. File loading, file storing, encryption, decryption, encoding, and storage communication should live in separate components/modules.
 
+The project should expose the CLI through the Python console script `tobicloud`.
+
+For convenience when working directly from the project root, include platform launchers:
+
+- `tobicloud.cmd` for Windows Command Prompt.
+- `tobicloud` as a POSIX shell launcher for Linux and macOS.
+
+Both launchers should prefer the local virtual environment's installed `tobicloud` executable and fall back to `uv run tobicloud`.
+
 **CLI Requirements**
 
 `upload`:
@@ -27,6 +36,7 @@ tobicloud upload <path> [-p PASSWORD] [-a ALIAS]
 - If `-p` is omitted, the file is uploaded without encryption.
 - `-a ALIAS` is optional.
 - If an alias is provided, store an alias mapping after upload.
+- The CLI should show a progress bar while uploading segments.
 
 `download`:
 
@@ -40,6 +50,8 @@ tobicloud download <hash-or-alias> <downloadpath> [-p PASSWORD]
 - If the downloaded file header says the file is encrypted and `-p` was not provided, prompt the user for the password using hidden input.
 - If the file is encrypted, use the password to decrypt it.
 - If the file is not encrypted, ignore any provided password.
+- The CLI should show a progress bar while downloading segments.
+- Progress rendering belongs in the CLI layer. Upload/download components should only expose an optional progress callback that reports the current segment count and total segment count.
 
 **Raw File Processing**
 
@@ -66,7 +78,8 @@ Use a PBKDF2-derived AES-256 key.
 - Salt: no per-file salt should be used.
 - If the library requires a salt, use a fixed salt constant.
 - AES key length: 256 bits.
-- Use a reasonable/default AES mode.
+- Use AES-GCM with a random nonce.
+- The encrypted payload should include a small magic/version marker and the nonce before the ciphertext so it can be decrypted without storing encryption metadata in the header.
 - The encryption format must include whatever minimal metadata is needed to decrypt, but avoid putting encryption metadata into the storage header.
 - The storage header must remain small enough to fit in one storage value.
 - The live API rejects `text` values longer than 500 characters, so storage values must be capped at 500 characters.
